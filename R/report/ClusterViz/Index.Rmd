@@ -1,0 +1,164 @@
+---
+title: "Clustered Energy Consumption Patterns"
+output: 
+  flexdashboard::flex_dashboard:
+    vertical_layout: fill
+    orientation: rows
+runtime: shiny
+---
+
+<!-- Learn more about flexdashboard at https://rstudio.github.io/flexdashboard -->
+
+
+```{r setup, include=FALSE}
+# Load packages and initialize data here
+library(flexdashboard)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(dygraphs)
+library(lubridate)
+library(data.table)
+library(RColorBrewer)
+library(plotly)
+
+
+rm(list=ls())
+
+source('aux.R')
+
+
+```
+
+Time Series
+=======================================================================
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+```{r inputs}
+ selectInput(
+        'clusters', strong('Select clusters to visualize'), choices = 1:(ncol(series)-1),
+            multiple = TRUE, selected=1:5
+      )
+
+#inestable
+#observeEvent(input$clusters2, {updateSelectInput(session, "clusters", selected=input$clusters2)})
+```
+
+Click and drag for zoom. Double click to reset zoom.
+The number in the bottom-left corner controls the width of rolling average span: 1 displays hourly values, 24 for daily moving average and so on.
+
+-----
+
+```{r input_fields}
+selectInput("field", strong("Classification Field"), choices=list("CNAE","MERCADO","power_class", "CUPS_class"),
+            multiple=FALSE)
+
+```
+
+* **CNAE**: Custormer Type. Household (T1) or bussines (T2)
+* **MERCADO**: Regulated Tariff (M1) or free market price (M2)
+* **power_class**: Contracted capacity class (quartile split). In W.
+* **CUPS_class**: TARGET_TENENCIA_CUPS class (quartile split, 0's grouped into a single category). TARGET_TENENCIA_CUPS measures the probability of Gas supply available in the customer area.
+
+Missing values frequencies are also displayed when present (dark grey bars)
+
+Row
+-----------------------------------------------------------------------
+
+### Time Line
+
+```{r dy_gr}
+renderDygraph({
+    if (length(input$clusters)==0)
+        return(NULL)
+    dygraph_df(series[, c(1,as.integer(input$clusters)+1)] %>% filter(fecha>fecha_i), group='gr1') %>% 
+        dyRoller(rollPeriod = 24) %>% 
+        dyAxis("y", label = "Proportion of contracted power") %>%
+        dyOptions(includeZero = TRUE)
+})
+```
+
+Row
+-----------------------------------------------------------------------
+
+###
+
+```{r, plot1}
+
+renderPlot({
+    compositionPlot(field=input$field)
+})
+
+```
+
+###
+
+```{r, plot2}
+renderPlot({
+    frequencyDevPlot(field=input$field)
+})
+```
+
+
+
+```{r}
+# Code for Chart C
+```
+
+Averaged Patterns
+=======================================================================
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+```{r inputs2}
+ selectInput(
+        'clusters2', strong('Select clusters to visualize'), choices = 1:(ncol(series)-1),
+            multiple = TRUE, selected=1:5
+      )
+
+#inestable
+#observeEvent(input$clusters, {updateSelectInput(session, "clusters2", selected=input$clusters)})
+
+```
+
+Hover on the series to query associated values.
+
+Row
+-----------------------------------------------------------------------
+### Week day average values
+```{r gr_semana}
+#renderPlot({plot(grafico_promedios(series_wday_m, 'wday', input$clusters2))})
+renderPlotly({ggplotly(grafico_promedios(series_wday_m, 'wday', input$clusters2))})
+```
+
+### Week day deviation from average
+```{r gr_semana_dev}
+renderPlotly({ggplotly(grafico_promedios(mean_dev_wday, 'wday', input$clusters2))})
+```
+
+Row
+-----------------------------------------------------------------------
+### Monthly average values
+```{r gr_mes}
+renderPlotly({ggplotly(grafico_promedios(series_month_m, 'month', input$clusters2))})
+```
+
+### Monthly deviation from average
+```{r gr_mes_dev}
+renderPlotly({ggplotly(grafico_promedios(mean_dev_month, 'month', input$clusters2))})
+```
+
+
+
+Hourly Averaged Patterns
+=======================================================================
+
+Row 
+-----------------------------------------------------------------------
+
+### Hourly average consumption by month
+```{r hour_month_plot}
+ renderPlot({plot(gr_h_month)})
+#plot(gr_h_month)
+```
