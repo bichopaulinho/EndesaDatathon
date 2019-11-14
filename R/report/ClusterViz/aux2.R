@@ -171,4 +171,3 @@ gr_h_month <- ggplot(series_h_month_m, aes(x=hour, y=value, colour=as.factor(mon
 meses <- as.integer(series_month[,month])
 mean_dev_month <-  melt(series_month[, lapply(.SD, function(x) x-mean(x)), .SDcols=-1][,month:=meses],
                         id.vars='month', variable.name = 'cluster')
-
