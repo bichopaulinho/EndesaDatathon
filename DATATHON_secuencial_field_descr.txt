@@ -1,0 +1,14 @@
+Campos del API
+Día: fecha en la que se realizó el consumo siguiendo el siguiente formato AAAMMDD (Año/mes/día).
+H1, H2,…, H25: hora dentro del día correspondiente. Se dan 25 registros debido a que existe un día del año (último sábado de octubre) en el que se cambia el horario y dicho día tiene 25 horas.
+ACTIVA_H1, ACTIVA_H2,…, ACTIVA_H25: energía activa consumida para cada hora medida en Wh (vatio hora). Se trata de la energía útil que los clientes absorben de la red y transforman en trabajo y/o calor en su casa.
+REACTIVA_H1, REACTIVA_H2,…, REACTIVA_H25: energía reactiva consumida para cada hora medida en VArh (voltiamperio reactivo hora). Se trata de un consumo suplementario que los clientes no pueden aprovechar. Actualmente la energía reactiva no se factura, aunque podría facturarse en el futuro como medida para mejorar la eficiencia energética en el hogar.
+DE_MUNICIP: municipio en el que se encuentra el cliente sobre el que se dan los datos de consumo horario. Referencia geográfica.
+FECHA_ALTA_STRO: fecha en la que dio de alta su suministro el cliente en cuestión con el siguiente formato QXAAAA (cuatrimestre/año). Referencia temporal.
+TARGET_TENENCIA_CUPS: probabilidad de que en dicho municipio exista distribución de gas natural (no implica que el cliente tenga contratado servicio de gas natural).
+IDENTIFICADOR: código identificador que te permite individualizar los consumos por cliente.
+CNAE: (Clasificación Nacional Actividades Económicas) indica si el cliente es doméstico (T1) o no lo es (T2).
+PRODUCTO: tarifa/producto eléctrico que el cliente tiene contratado como servicio. Existen hasta 120 productos.
+MERCADO: indica si se trata de un cliente con tarifa regulada (M1) o un cliente con tarifa de Mercado Libre (M2).
+Tarifa Regulada: el precio de la electricidad viene regulado de forma periódica por el organismo competente.
+Mercado Libre: el precio de la electricidad es libremente pactado entre la comercializadora y el cliente.
