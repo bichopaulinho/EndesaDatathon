@@ -84,7 +84,14 @@ OrganizaDatosDT <- function(rawdata, wide=FALSE, atr_usu=FALSE, filtra_dupl=F){
     return(energia)
 }
 
-
+# Wrapper para subir ficheros al Bucket de AWS
+subeBucket <- function(file, host='s3-eu-central-1.amazonaws.com', bucket='mdcendesa'){
+  require(S3)
+  # link access info to the corresponding vars
+  S3_connect(access_key = MYACCESSKEY, secret_key = MYKEY,hostname = host)
+  st <- S3_put_object(bucket, file)
+  
+}
 # Funciones de filtrado de datos
 #'
 #'@description Funcion de filtrado de registros duplicados para la dupla IDENTIFICADOR-DIA. En primera versión sólo deja el

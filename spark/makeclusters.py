@@ -12,11 +12,13 @@ from numpy import array
 from math import sqrt
 import csv
 
+BUCKET='mcdendesa'
+
 with open ("/root/spark-ec2/cluster-url", "r") as myfile:
         cluster_url=myfile.readlines()
         myfile.close()
 
-print "Starting Spark Context\n"
+print("Starting Spark Context")
 # TO DO: leer automaticamente la direccion del cluster del fichero /root/spark-ec2/cluster-url
 conf = SparkConf().setMaster(cluster_url[0].rstrip('\n')).setAppName("KlusterMaker")
 sc = SparkContext(conf = conf)
@@ -28,9 +30,9 @@ sc = SparkContext(conf = conf)
 #pairedData = sc.wholeTextFiles('file:///home/paulino.tardaguila/BitBucket/endesa/tratamientodatos/R/user_rowfiles/255*.txt').map(lambda (x,y): (long(re.findall('\d+',x)[0]),map(float, y.split(" "))))
 
 
-print "Retrieving info from S3 bucket\n"
+print("Retrieving info from S3 bucket")
 #ficheros en bucket S3
-pairedData = sc.wholeTextFiles('s3n://mdcendesa/user_rowfiles/*.txt').map(lambda (x,y): (long(re.findall('\d+',x)[1]),map(float, y.split(" "))))
+pairedData = sc.wholeTextFiles('s3n://' + BUCKET + '/user_rowfiles/*.txt').map(lambda (x,y): (long(re.findall('\d+',x)[1]),map(float, y.split(" "))))
 
 pairedData.persist()
 
@@ -81,8 +83,6 @@ lines = asigRDD.map(toCSVLine)
 #lines.saveAsTextFile('s3n://mdcendesa/output/asignacion_kmeans.csv')
 
 #lo guardo en local, al máximo tendrá 100.000 lineas
-# to do: ruta relativa al directorio de trabajo
-#with file('/home/paulino/BitBucket/endesa/tratamientodatos/spark/output/asignacion_kmeans.csv', 'w') as outfile:
 with file('output/asignacion_kmeans.csv', 'w') as outfile:
 	for item in lines.collect():
   		outfile.write("%s\n" % item)
@@ -91,7 +91,6 @@ with file('output/asignacion_kmeans.csv', 'w') as outfile:
 
 item_length = len(centroides[0])
 
-#with file('/home/paulino/BitBucket/endesa/tratamientodatos/spark/output/centroides_kmeans.csv','w') as outfile:
 with file('output/centroides_kmeans.csv','w') as outfile:
     file_writer = csv.writer(outfile)
     for i in range(item_length):

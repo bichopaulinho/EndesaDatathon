@@ -111,11 +111,15 @@ for (i in 0:nvueltas){
     status <- sapply(1:nrow(matriz_cluster), function(i){
         if (i %% 1000 == 0)
             cat(i, '\n')
-        ff <- file(sprintf('user_rowfiles/%s_filtered_nactiva.txt', rownames(matriz_cluster)[i]))
+
+        client_file <- sprintf('user_rowfiles/%s_filtered_nactiva.txt', rownames(matriz_cluster)[i]) 
+        ff <- file(client_file)
         writeLines(
             as.character(paste0(round(matriz_cluster[i, ],6), collapse=" ")),
             con = ff)
         close(ff)
+        subeBucket(client_file)
+        # TODO rm ff upon successful upload to S3 bucket
     })
     
     rm(matriz_cluster)
